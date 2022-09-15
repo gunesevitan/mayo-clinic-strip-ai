@@ -10,7 +10,7 @@ sys.path.append('..')
 import settings
 
 
-JPEG_QUALITY = 50
+SCALE = 4
 
 if __name__ == '__main__':
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
         image = tifffile.imread(f'{train_images}/{row["image_id"]}.tif')
         raw_image_megabytes = image.nbytes / (1024 ** 2)
-        cv2.imwrite(str(settings.DATA / 'train_compressed' / f'{row["image_id"]}.jpg'), image, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
+        cv2.imwrite(str(settings.DATA / 'train_compressed' / f'{row["image_id"]}.jpg'), image[::SCALE, ::SCALE, ::-1])
         compressed_image_megabytes = os.path.getsize(str(settings.DATA / 'train_compressed' / f'{row["image_id"]}.jpg')) / (1024 ** 2)
 
         logging.info(f'Image {row["image_id"]} Raw Size: {raw_image_megabytes:.4f} Compressed Size: {compressed_image_megabytes:.4f}')
@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
         image = tifffile.imread(f'{test_images}/{row["image_id"]}.tif')
         raw_image_megabytes = image.nbytes / (1024 ** 2)
-        cv2.imwrite(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg'), image, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
+        cv2.imwrite(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg'), image[::SCALE, ::SCALE, ::-1])
         compressed_image_megabytes = os.path.getsize(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg')) / (1024 ** 2)
 
         logging.info(f'Image {row["image_id"]} Raw Size: {raw_image_megabytes:.4f} Compressed Size: {compressed_image_megabytes:.4f}')
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
         image = tifffile.imread(f'{other_images}/{row["image_id"]}.tif')
         raw_image_megabytes = image.nbytes / (1024 ** 2)
-        cv2.imwrite(str(settings.DATA / 'other_compressed' / f'{row["image_id"]}.jpg'), image, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
+        cv2.imwrite(str(settings.DATA / 'other_compressed' / f'{row["image_id"]}.jpg'), image[::SCALE, ::SCALE, ::-1])
         compressed_image_megabytes = os.path.getsize(str(settings.DATA / 'other_compressed' / f'{row["image_id"]}.jpg')) / (1024 ** 2)
 
         logging.info(f'Image {row["image_id"]} Raw Size: {raw_image_megabytes:.4f} Compressed Size: {compressed_image_megabytes:.4f}')
