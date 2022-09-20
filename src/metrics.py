@@ -46,7 +46,7 @@ def binary_classification_scores(y_true, y_pred, threshold):
 
     scores = {
         'accuracy': accuracy_score(y_true, soft_predictions_to_labels(y_pred, threshold=threshold)),
-        'roc_auc_score': roc_auc_score(y_true, y_pred),
+        'roc_auc': roc_auc_score(y_true, y_pred),
         'log_loss': log_loss(y_true, y_pred)
     }
 
@@ -70,7 +70,7 @@ def multiclass_classification_scores(y_true, y_pred):
 
     scores = {
         'accuracy': accuracy_score(y_true, np.argmax(y_pred, axis=1)),
-        'roc_auc_score': [roc_auc_score(y_true, y_pred[:, i]) for i in range(y_pred.shape[1])],
+        'roc_auc': [roc_auc_score(y_true, y_pred[:, i]) for i in range(y_pred.shape[1])],
         'log_loss': log_loss(y_true, y_pred)
     }
 
