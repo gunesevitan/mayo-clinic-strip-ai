@@ -15,7 +15,8 @@ class ClassificationHead(nn.Module):
             nn.Linear(input_features * 2 if pooling_type == 'concat' else input_features, intermediate_features, bias=True),
             getattr(nn, activation)(**activation_args),
             nn.Dropout(p=dropout_probability) if dropout_probability >= 0 else nn.Identity(),
-            nn.Linear(intermediate_features, n_classes, bias=True)
+            nn.Linear(intermediate_features, n_classes, bias=True),
+            nn.Softmax(dim=-1) if n_classes > 1 else nn.Identity()
         )
 
     def forward(self, x):
@@ -62,7 +63,7 @@ class MultiInstanceLearningModel(nn.Module):
 
         # Stack feature maps on channel dimension before passing feature maps to classification head
         feature_batch_size, feature_channel, feature_height, feature_width = x.shape
-        x = x.view(input_batch_size, feature_channel * input_instance, feature_height, feature_width)
+        x = x.contiguous().view(input_batch_size, feature_channel * input_instance, feature_height, feature_width)
         output = self.classification_head(x)
 
         return output
