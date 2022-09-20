@@ -41,7 +41,6 @@ class ClassificationDataset(Dataset):
             n_tiles=self.n_tiles
         )
         del image
-        print(tiles.shape)
 
         if self.labels is not None:
 
