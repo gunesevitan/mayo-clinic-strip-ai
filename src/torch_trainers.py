@@ -6,11 +6,13 @@ import json
 import pandas as pd
 from tqdm import tqdm
 import numpy as np
+import cv2
 import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 import torch.optim as optim
 
 import settings
+import image_utils
 import visualization
 import transforms
 import torch_datasets
@@ -306,3 +308,99 @@ class ClassificationTrainer:
                 path=model_root_directory / f'training_scores.png'
             )
             logging.info(f'Saved training_scores.png to {model_root_directory}')
+
+    def inference(self, df_train):
+
+        """
+        Inference on inputs and targets listed on given dataframes with specified configuration and transforms
+
+        Parameters
+        ----------
+        df_train (pandas.DataFrame of shape (n_rows, n_columns)): Dataframe of filenames, targets and folds
+        """
+
+        logging.info(f'\n{"-" * 30}\nRunning {self.persistence_parameters["name"]} Model for Inference - Seed: {self.training_parameters["random_state"]}\n{"-" * 30}\n')
+
+        # Create directory for models and visualizations
+        model_root_directory = Path(settings.MODELS / self.persistence_parameters['name'])
+        model_root_directory.mkdir(parents=True, exist_ok=True)
+
+        test_transforms = transforms.get_classification_transforms(**self.transform_parameters)['test']
+        scores = {
+            'fold_scores': {},
+            'oof_scores': None
+        }
+
+        for fold in self.inference_parameters['folds']:
+
+            val_idx = df_train.loc[df_train[fold] == 1].index
+            logging.info(f'\n{fold}  - Validation {len(val_idx)} ({len(val_idx) // self.training_parameters["test_batch_size"] + 1} steps)')
+
+            # Set model, loss function, device and seed for reproducible results
+            torch_utils.set_seed(self.training_parameters['random_state'], deterministic_cudnn=self.training_parameters['deterministic_cudnn'])
+            device = torch.device(self.training_parameters['device'])
+
+            model = getattr(torch_modules, self.model_parameters['model_class'])(**self.model_parameters['model_args'])
+            model.load_state_dict(torch.load(model_root_directory / f'model_{fold}_best.pt'))
+            model.to(device)
+            model.eval()
+
+            for idx, row in tqdm(df_train.loc[val_idx, :].iterrows(), total=len(val_idx)):
+
+                image = cv2.imread(row[self.dataset_parameters['inputs']])
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                tiles = image_utils.tile_image(
+                    image=image,
+                    tile_size=self.dataset_parameters['tile_size'],
+                    n_tiles=self.dataset_parameters['n_tiles']
+                )
+                del image
+
+                # Apply transforms to tiles and stack them along the batch dimension
+                tiles = [test_transforms(image=tile)['image'].float() for tile in tiles]
+                tiles = torch.stack(tiles, dim=0)
+                inputs = torch.unsqueeze(tiles, dim=0)
+                inputs = inputs.to('cuda')
+
+                with torch.no_grad():
+                    outputs = model(inputs)
+
+                predictions = outputs.detach().cpu()
+                predictions = torch.sigmoid(torch.squeeze(predictions, dim=1)).numpy().astype(np.float32)
+                df_train.loc[idx, 'predictions'] = predictions
+
+            if self.dataset_parameters['targets'] == 'binary_encoded_label':
+                fold_scores = metrics.binary_classification_scores(
+                    y_true=df_train.loc[val_idx, 'binary_encoded_label'],
+                    y_pred=df_train.loc[val_idx, 'predictions'],
+                    threshold=0.5
+                )
+            elif self.dataset_parameters['targets'] == 'multiclass_encoded':
+                fold_scores = metrics.multiclass_classification_scores(
+                    y_true=df_train.loc[val_idx, 'multiclass_encoded'],
+                    y_pred=df_train.loc[val_idx, 'predictions']
+                )
+            else:
+                raise ValueError(f'Invalid targets {self.dataset_parameters["targets"]}')
+
+            logging.info(f'Validation Scores: {json.dumps(fold_scores, indent=2)}')
+            scores['fold_scores'][fold] = fold_scores
+
+        if self.dataset_parameters['targets'] == 'binary_encoded_label':
+            oof_scores = metrics.binary_classification_scores(
+                y_true=df_train.loc[:, 'binary_encoded_label'],
+                y_pred=df_train.loc[:, 'predictions'],
+                threshold=0.5
+            )
+        elif self.dataset_parameters['targets'] == 'multiclass_encoded':
+            oof_scores = metrics.multiclass_classification_scores(
+                y_true=df_train.loc[:, 'multiclass_encoded'],
+                y_pred=df_train.loc[:, 'predictions']
+            )
+        else:
+            raise ValueError(f'Invalid targets {self.dataset_parameters["targets"]}')
+
+        logging.info(f'OOF Scores: {json.dumps(oof_scores, indent=2)}')
+        scores['oof_scores'] = oof_scores
+        with open(model_root_directory / f'inference_scores.json', mode='w') as f:
+            json.dump(scores, f, indent=2)
