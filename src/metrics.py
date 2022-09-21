@@ -44,10 +44,17 @@ def binary_classification_scores(y_true, y_pred, threshold):
     scores (dict): Dictionary of scores
     """
 
+    accuracy = accuracy_score(y_true, soft_predictions_to_labels(y_pred, threshold=threshold))
+    try:
+        roc_auc = roc_auc_score(y_true, y_pred)
+    except ValueError:
+        roc_auc = 0.5
+    log_loss_ = log_loss(y_true, y_pred)
+
     scores = {
-        'accuracy': accuracy_score(y_true, soft_predictions_to_labels(y_pred, threshold=threshold)),
-        'roc_auc': roc_auc_score(y_true, y_pred),
-        'log_loss': log_loss(y_true, y_pred)
+        'accuracy': accuracy,
+        'roc_auc': roc_auc,
+        'log_loss': log_loss_
     }
 
     return scores
@@ -68,10 +75,17 @@ def multiclass_classification_scores(y_true, y_pred):
     scores (dict): Dictionary of scores
     """
 
+    accuracy = accuracy_score(y_true, soft_predictions_to_labels(y_pred, threshold=threshold))
+    try:
+        roc_auc = np.mean([roc_auc_score(y_true, y_pred[:, i]) for i in range(y_pred.shape[1])])
+    except ValueError:
+        roc_auc = 0.5
+    log_loss_ = log_loss(y_true, y_pred)
+
     scores = {
-        'accuracy': accuracy_score(y_true, np.argmax(y_pred, axis=1)),
-        'roc_auc': np.mean([roc_auc_score(y_true, y_pred[:, i]) for i in range(y_pred.shape[1])]),
-        'log_loss': log_loss(y_true, y_pred)
+        'accuracy': accuracy,
+        'roc_auc': roc_auc,
+        'log_loss': log_loss_
     }
 
     return scores
