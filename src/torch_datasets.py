@@ -45,7 +45,8 @@ class ClassificationDataset(Dataset):
         if self.labels is not None:
 
             label = self.labels[idx]
-            label = torch.as_tensor(label, dtype=torch.long)
+            label = torch.as_tensor(label, dtype=torch.float)
+            label = torch.unsqueeze(label, dim=0)
 
             if self.transforms is not None:
                 # Apply transforms to tiles and stack them along the batch dimension
