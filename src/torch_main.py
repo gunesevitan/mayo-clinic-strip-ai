@@ -38,6 +38,6 @@ if __name__ == '__main__':
         )
 
         if args.mode == 'train':
-            trainer.train_and_validate(df_train=df_train, df_test=df_test)
+            trainer.train_and_validate(df_train=df_train)
         elif args.mode == 'inference':
             trainer.inference(df_train=df_train)
