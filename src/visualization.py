@@ -66,6 +66,8 @@ def visualize_image(image, metadata, path=None):
         image_path = image
         image = cv2.imread(str(settings.DATA / image_path))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    elif isinstance(image, np.ndarray):
+        pass
     else:
         # Raise TypeError if image argument is not an array-like object or a path-like string
         raise TypeError('Image is not an array or path.')
@@ -130,7 +132,7 @@ def visualize_transforms(image, transforms, path=None):
         plt.close(fig)
 
 
-def visualize_learning_curve(training_losses, validation_losses, path=None):
+def visualize_learning_curve(training_losses, validation_losses, validation_scores, path=None):
 
     """
     Visualize learning curves of the models
@@ -142,29 +144,37 @@ def visualize_learning_curve(training_losses, validation_losses, path=None):
     path (str or None): Path of the output file (if path is None, plot is displayed with selected backend)
     """
 
-    fig, ax = plt.subplots(figsize=(32, 8), dpi=100)
-
+    fig, axes = plt.subplots(figsize=(32, 18), nrows=2, dpi=100)
     sns.lineplot(
         x=np.arange(1, len(training_losses) + 1),
         y=training_losses,
-        ax=ax,
+        ax=axes[0],
         label='train_loss'
     )
-
     if validation_losses is not None:
         sns.lineplot(
             x=np.arange(1, len(validation_losses) + 1),
             y=validation_losses,
-            ax=ax,
+            ax=axes[0],
             label='val_loss'
         )
+    for metric, scores in validation_scores.items():
+        sns.lineplot(
+            x=np.arange(1, len(scores) + 1),
+            y=scores,
+            ax=axes[1],
+            label=metric
+        )
 
-    ax.set_xlabel('Epochs/Steps', size=15, labelpad=12.5)
-    ax.set_ylabel('Loss', size=15, labelpad=12.5)
-    ax.tick_params(axis='x', labelsize=12.5, pad=10)
-    ax.tick_params(axis='y', labelsize=12.5, pad=10)
-    ax.legend(prop={'size': 18})
-    ax.set_title('Learning Curve', size=20, pad=15)
+    for i in range(2):
+        axes[i].set_xlabel('Epochs/Steps', size=15, labelpad=12.5)
+        axes[i].set_ylabel('Loss/Metrics', size=15, labelpad=12.5)
+        axes[i].tick_params(axis='x', labelsize=12.5, pad=10)
+        axes[i].tick_params(axis='y', labelsize=12.5, pad=10)
+        axes[i].legend(prop={'size': 18})
+
+    axes[0].set_title('Training and Validation Losses', size=20, pad=15)
+    axes[1].set_title('Validation Scores', size=20, pad=15)
 
     if path is None:
         plt.show()
