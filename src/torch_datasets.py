@@ -1,24 +1,21 @@
-import os
-os.environ['OPENCV_IO_MAX_IMAGE_PIXELS'] = pow(2, 40).__str__()
 import cv2
 import torch
 from torch.utils.data import Dataset
 
-import image_utils
+import settings
 
 
 class ClassificationDataset(Dataset):
 
-    def __init__(self, image_paths, labels, tile_size, n_tiles, transforms=None):
+    def __init__(self, image_ids, labels, n_tiles, transforms=None):
 
-        self.image_paths = image_paths
+        self.image_ids = image_ids
         self.labels = labels
-        self.tile_size = tile_size
         self.n_tiles = n_tiles
         self.transforms = transforms
 
     def __len__(self):
-        return len(self.image_paths)
+        return len(self.image_ids)
 
     def __getitem__(self, idx):
 
@@ -35,14 +32,11 @@ class ClassificationDataset(Dataset):
         label (torch.FloatTensor of shape (1)): Label tensor
         """
 
-        image = cv2.imread(str(self.image_paths[idx]))
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        tiles = image_utils.tile_image(
-            image=image,
-            tile_size=self.tile_size,
-            n_tiles=self.n_tiles
-        )
-        del image
+        tiles = []
+        for tile_idx in range(self.n_tiles):
+            image = cv2.imread(str(settings.DATA / 'train_compressed_tiles' / f'{self.image_ids[idx]}_{tile_idx}.jpg'))
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            tiles.append(image)
 
         if self.labels is not None:
 

@@ -149,9 +149,8 @@ class ClassificationTrainer:
 
             logging.info(f'\nTraining: {len(train_idx)} ({len(train_idx) // self.training_parameters["training_batch_size"] + 1} steps) - Validation {len(val_idx)} ({len(val_idx) // self.training_parameters["test_batch_size"] + 1} steps)')
             train_dataset = torch_datasets.ClassificationDataset(
-                image_paths=df_train.loc[train_idx, self.dataset_parameters['inputs']].values,
+                image_ids=df_train.loc[train_idx, 'image_id'].values,
                 labels=df_train.loc[train_idx, self.dataset_parameters['targets']].values,
-                tile_size=self.dataset_parameters['tile_size'],
                 n_tiles=self.dataset_parameters['n_tiles'],
                 transforms=dataset_transforms['train'],
             )
@@ -164,9 +163,8 @@ class ClassificationTrainer:
                 num_workers=self.training_parameters['num_workers']
             )
             val_dataset = torch_datasets.ClassificationDataset(
-                image_paths=df_train.loc[val_idx, self.dataset_parameters['inputs']].values,
+                image_ids=df_train.loc[val_idx, 'image_id'].values,
                 labels=df_train.loc[val_idx, self.dataset_parameters['targets']].values,
-                tile_size=self.dataset_parameters['tile_size'],
                 n_tiles=self.dataset_parameters['n_tiles'],
                 transforms=dataset_transforms['test'],
             )
