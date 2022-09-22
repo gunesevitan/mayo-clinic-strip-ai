@@ -2,15 +2,40 @@ import sys
 import os
 import logging
 import pathlib
+import numpy as np
 import pandas as pd
 import cv2
 import tifffile
+import pyvips
 
 sys.path.append('..')
 import settings
 
 
-SCALE = 4
+MAX_SIZE = 20000
+JPEG_QUALITY = 100
+DTYPE_MAPPING = {
+   'uchar': np.uint8,
+   'char': np.int8,
+   'ushort': np.uint16,
+   'short': np.int16,
+   'uint': np.uint32,
+   'int': np.int32,
+   'float': np.float32,
+   'double': np.float64,
+   'complex': np.complex64,
+   'dpcomplex': np.complex128,
+}
+
+
+def vips_to_numpy(image_thumbnail):
+
+    return np.ndarray(
+        buffer=image_thumbnail.write_to_memory(),
+        dtype=DTYPE_MAPPING[image_thumbnail.format],
+        shape=[image_thumbnail.height, image_thumbnail.width, image_thumbnail.bands]
+    )
+
 
 if __name__ == '__main__':
 
@@ -32,27 +57,30 @@ if __name__ == '__main__':
 
     for idx, row in df_train.iterrows():
 
-        image = tifffile.imread(f'{train_images}/{row["image_id"]}.tif')
+        image_thumbnail = pyvips.Image.thumbnail(f'{train_images}/{row["image_id"]}.tif', MAX_SIZE)
+        image = vips_to_numpy(image_thumbnail=image_thumbnail)
         raw_image_megabytes = image.nbytes / (1024 ** 2)
-        cv2.imwrite(str(settings.DATA / 'train_compressed' / f'{row["image_id"]}.jpg'), image[::SCALE, ::SCALE, ::-1])
+        cv2.imwrite(str(settings.DATA / 'train_compressed' / f'{row["image_id"]}.jpg'), image, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
         compressed_image_megabytes = os.path.getsize(str(settings.DATA / 'train_compressed' / f'{row["image_id"]}.jpg')) / (1024 ** 2)
 
         logging.info(f'Image {row["image_id"]} Raw Size: {raw_image_megabytes:.4f} Compressed Size: {compressed_image_megabytes:.4f}')
 
     for idx, row in df_test.iterrows():
 
-        image = tifffile.imread(f'{test_images}/{row["image_id"]}.tif')
+        image_thumbnail = pyvips.Image.thumbnail(f'{test_images}/{row["image_id"]}.tif', MAX_SIZE)
+        image = vips_to_numpy(image_thumbnail=image_thumbnail)
         raw_image_megabytes = image.nbytes / (1024 ** 2)
-        cv2.imwrite(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg'), image[::SCALE, ::SCALE, ::-1])
+        cv2.imwrite(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg'), image, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
         compressed_image_megabytes = os.path.getsize(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg')) / (1024 ** 2)
 
         logging.info(f'Image {row["image_id"]} Raw Size: {raw_image_megabytes:.4f} Compressed Size: {compressed_image_megabytes:.4f}')
 
     for idx, row in df_other.iterrows():
 
-        image = tifffile.imread(f'{other_images}/{row["image_id"]}.tif')
+        image_thumbnail = pyvips.Image.thumbnail(f'{test_images}/{row["image_id"]}.tif', MAX_SIZE)
+        image = vips_to_numpy(image_thumbnail=image_thumbnail)
         raw_image_megabytes = image.nbytes / (1024 ** 2)
-        cv2.imwrite(str(settings.DATA / 'other_compressed' / f'{row["image_id"]}.jpg'), image[::SCALE, ::SCALE, ::-1])
+        cv2.imwrite(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg'), image, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
         compressed_image_megabytes = os.path.getsize(str(settings.DATA / 'other_compressed' / f'{row["image_id"]}.jpg')) / (1024 ** 2)
 
         logging.info(f'Image {row["image_id"]} Raw Size: {raw_image_megabytes:.4f} Compressed Size: {compressed_image_megabytes:.4f}')
