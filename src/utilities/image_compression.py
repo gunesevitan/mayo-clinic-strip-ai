@@ -59,6 +59,7 @@ if __name__ == '__main__':
 
         image_thumbnail = pyvips.Image.thumbnail(f'{train_images}/{row["image_id"]}.tif', MAX_SIZE)
         image = vips_to_numpy(image_thumbnail=image_thumbnail)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         raw_image_megabytes = image.nbytes / (1024 ** 2)
         cv2.imwrite(str(settings.DATA / 'train_compressed' / f'{row["image_id"]}.jpg'), image, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
         compressed_image_megabytes = os.path.getsize(str(settings.DATA / 'train_compressed' / f'{row["image_id"]}.jpg')) / (1024 ** 2)
@@ -69,6 +70,7 @@ if __name__ == '__main__':
 
         image_thumbnail = pyvips.Image.thumbnail(f'{test_images}/{row["image_id"]}.tif', MAX_SIZE)
         image = vips_to_numpy(image_thumbnail=image_thumbnail)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         raw_image_megabytes = image.nbytes / (1024 ** 2)
         cv2.imwrite(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg'), image, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
         compressed_image_megabytes = os.path.getsize(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg')) / (1024 ** 2)
@@ -79,6 +81,7 @@ if __name__ == '__main__':
 
         image_thumbnail = pyvips.Image.thumbnail(f'{test_images}/{row["image_id"]}.tif', MAX_SIZE)
         image = vips_to_numpy(image_thumbnail=image_thumbnail)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         raw_image_megabytes = image.nbytes / (1024 ** 2)
         cv2.imwrite(str(settings.DATA / 'test_compressed' / f'{row["image_id"]}.jpg'), image, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
         compressed_image_megabytes = os.path.getsize(str(settings.DATA / 'other_compressed' / f'{row["image_id"]}.jpg')) / (1024 ** 2)
