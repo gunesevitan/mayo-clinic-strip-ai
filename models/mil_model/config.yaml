@@ -3,15 +3,14 @@ task: binary_classification
 dataset_parameters:
   inputs: image_filename
   targets: binary_encoded_label
-  tile_size: 256
-  n_tiles: 4
+  n_tiles: 16
 
 model_parameters:
   model_class: MultiInstanceLearningModel
   model_args:
-    n_instances: 2
+    n_instances: 16
     model_module: timm
-    model_name: resnet18
+    model_name: efficientnet_b0
     pretrained: True
     head_args:
       intermediate_features: 512
@@ -37,14 +36,16 @@ training_parameters:
     patience: 5
   epochs: 250
   early_stopping_patience: 5
-  training_batch_size: 16
-  test_batch_size: 32
+  training_batch_size: 8
+  test_batch_size: 16
   num_workers: 4
   random_state: 42
   deterministic_cudnn: False
   device: cuda
 
 transform_parameters:
+  resize_height: 256
+  resize_width: 256
   horizontal_flip_probability: 0.5
   vertical_flip_probability: 0.5
   normalize_mean: [0.2731810965836966, 0.27189342403255906, 0.27162518728784174]
