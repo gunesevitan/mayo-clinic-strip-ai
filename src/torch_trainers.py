@@ -345,14 +345,11 @@ class ClassificationTrainer:
 
             for idx, row in tqdm(df_train.loc[val_idx, :].iterrows(), total=len(val_idx)):
 
-                image = cv2.imread(row[self.dataset_parameters['inputs']])
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                tiles = image_utils.tile_image(
-                    image=image,
-                    tile_size=self.dataset_parameters['tile_size'],
-                    n_tiles=self.dataset_parameters['n_tiles']
-                )
-                del image
+                tiles = []
+                for tile_idx in range(self.dataset_parameters['n_tiles']):
+                    image = cv2.imread(str(settings.DATA / 'train_compressed_tiles' / f'{row["image_id"]}_{tile_idx}.jpg'))
+                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                    tiles.append(image)
 
                 # Apply transforms to tiles and stack them along the batch dimension
                 tiles = [test_transforms(image=tile)['image'].float() for tile in tiles]

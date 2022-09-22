@@ -17,10 +17,9 @@ if __name__ == '__main__':
     pixel_sum = 0
     pixel_squared_sum = 0
 
-    train_images_compressed_filenames = glob(str(settings.DATA / 'train_compressed' / '*.jpg'))
-    other_images_compressed_filenames = glob(str(settings.DATA / 'other_compressed' / '*.jpg'))
+    train_images_compressed_filenames = glob(str(settings.DATA / 'train_compressed_tiles' / '*.jpg'))
 
-    image_filenames = train_images_compressed_filenames + other_images_compressed_filenames
+    image_filenames = train_images_compressed_filenames
 
     for image_filename in tqdm(image_filenames):
 
