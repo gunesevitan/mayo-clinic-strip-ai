@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 from albumentations import ImageOnlyTransform
@@ -62,6 +63,12 @@ def get_classification_transforms(**transform_parameters):
     """
 
     train_transforms = A.Compose([
+        A.Resize(
+            height=transform_parameters['resize_height'],
+            width=transform_parameters['resize_width'],
+            interpolation=cv2.INTER_NEAREST,
+            always_apply=True
+        ),
         A.HorizontalFlip(p=transform_parameters['horizontal_flip_probability']),
         A.VerticalFlip(p=transform_parameters['vertical_flip_probability']),
         A.Normalize(
@@ -74,6 +81,12 @@ def get_classification_transforms(**transform_parameters):
     ])
 
     val_transforms = A.Compose([
+        A.Resize(
+            height=transform_parameters['resize_height'],
+            width=transform_parameters['resize_width'],
+            interpolation=cv2.INTER_NEAREST,
+            always_apply=True
+        ),
         A.Normalize(
             mean=transform_parameters['normalize_mean'],
             std=transform_parameters['normalize_std'],
@@ -84,6 +97,12 @@ def get_classification_transforms(**transform_parameters):
     ])
 
     test_transforms = A.Compose([
+        A.Resize(
+            height=transform_parameters['resize_height'],
+            width=transform_parameters['resize_width'],
+            interpolation=cv2.INTER_NEAREST,
+            always_apply=True
+        ),
         A.Normalize(
             mean=transform_parameters['normalize_mean'],
             std=transform_parameters['normalize_std'],
