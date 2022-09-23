@@ -397,5 +397,9 @@ class ClassificationTrainer:
 
         logging.info(f'OOF Scores: {json.dumps(oof_scores, indent=2)}')
         scores['oof_scores'] = oof_scores
-        with open(model_root_directory / f'inference_scores.json', mode='w') as f:
+        with open(model_root_directory / 'inference_scores.json', mode='w') as f:
             json.dump(scores, f, indent=2)
+        logging.info(f'Saved inference_scores.json to {model_root_directory}')
+
+        df_train[['image_id', 'predictions']].to_csv(model_root_directory / 'train_predictions.csv', index=False)
+        logging.info(f'Saved train_predictions.csv to {model_root_directory}')
