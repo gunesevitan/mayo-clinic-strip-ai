@@ -79,6 +79,11 @@ def get_classification_transforms(**transform_parameters):
             val_shift_limit=transform_parameters['value_shift_limit'],
             p=transform_parameters['hue_saturation_value_probability']
         ),
+        A.RandomBrightnessContrast(
+            brightness_limit=transform_parameters['brightness_limit'],
+            contrast_limit=transform_parameters['contrast_limit'],
+            p=transform_parameters['random_brightness_contrast_probability']
+        ),
         A.Normalize(
             mean=transform_parameters['normalize_mean'],
             std=transform_parameters['normalize_std'],
