@@ -95,14 +95,7 @@ def get_classification_transforms(**transform_parameters):
                 p=transform_parameters['optical_distortion_probability']
             )
         ], p=transform_parameters['distortion_probability']),
-        A.OneOf([
-            A.ChannelShuffle(p=transform_parameters['channel_shuffle_probability']),
-            A.ChannelDropout(
-                channel_drop_range=transform_parameters['channel_dropout_channel_drop_range'],
-                fill_value=transform_parameters['channel_dropout_fill_value'],
-                p=transform_parameters['channel_dropout_probability']
-            )
-        ], p=transform_parameters['channel_transform_probability']),
+        A.ChannelShuffle(p=transform_parameters['channel_shuffle_probability']),
         A.Normalize(
             mean=transform_parameters['normalize_mean'],
             std=transform_parameters['normalize_std'],
