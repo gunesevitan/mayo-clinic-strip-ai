@@ -73,12 +73,6 @@ def get_classification_transforms(**transform_parameters):
         A.HorizontalFlip(p=transform_parameters['horizontal_flip_probability']),
         A.VerticalFlip(p=transform_parameters['vertical_flip_probability']),
         A.RandomRotate90(p=transform_parameters['random_rotate_90_probability']),
-        A.ShiftScaleRotate(
-            shift_limit=transform_parameters['shift_limit'],
-            scale_limit=transform_parameters['scale_limit'],
-            rotate_limit=transform_parameters['rotate_limit'],
-            p=transform_parameters['shift_scale_rotate_probability']
-        ),
         A.HueSaturationValue(
             hue_shift_limit=transform_parameters['hue_shift_limit'],
             sat_shift_limit=transform_parameters['saturation_shift_limit'],
@@ -91,6 +85,24 @@ def get_classification_transforms(**transform_parameters):
             max_pixel_value=transform_parameters['normalize_max_pixel_value'],
             always_apply=True
         ),
+        A.OneOf([
+            A.CoarseDropout(
+                max_holes=transform_parameters['coarse_dropout_max_holes'],
+                max_height=transform_parameters['coarse_dropout_max_height'],
+                max_width=transform_parameters['coarse_dropout_max_width'],
+                min_holes=transform_parameters['coarse_dropout_min_holes'],
+                min_height=transform_parameters['coarse_dropout_min_height'],
+                min_width=transform_parameters['coarse_dropout_min_width'],
+                fill_value=transform_parameters['coarse_dropout_fill_value'],
+                p=transform_parameters['coarse_dropout_probability']
+            ),
+            A.PixelDropout(
+                dropout_prob=transform_parameters['pixel_dropout_dropout_probability'],
+                per_channel=transform_parameters['pixel_dropout_per_channel'],
+                drop_value=transform_parameters['pixel_dropout_drop_value'],
+                p=transform_parameters['pixel_dropout_probability']
+            )
+        ], p=transform_parameters['dropout_probability']),
         ToTensorV2(always_apply=True)
     ])
 
