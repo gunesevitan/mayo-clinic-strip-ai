@@ -80,22 +80,9 @@ def get_classification_transforms(**transform_parameters):
             p=transform_parameters['hue_saturation_value_probability']
         ),
         A.OneOf([
-            A.GridDistortion(
-                num_steps=transform_parameters['grid_distortion_num_steps'],
-                distort_limit=transform_parameters['grid_distortion_distort_limit'],
-                interpolation=cv2.INTER_NEAREST,
-                border_mode=cv2.BORDER_REPLICATE,
-                p=transform_parameters['grid_distortion_probability']
-            ),
-            A.OpticalDistortion(
-                distort_limit=transform_parameters['optical_distortion_distort_limit'],
-                shift_limit=transform_parameters['optical_distortion_shift_limit'],
-                interpolation=cv2.INTER_NEAREST,
-                border_mode=cv2.BORDER_REPLICATE,
-                p=transform_parameters['optical_distortion_probability']
-            )
-        ], p=transform_parameters['distortion_probability']),
-        A.ChannelShuffle(p=transform_parameters['channel_shuffle_probability']),
+            A.ToGray(transform_parameters['grayscale_probability']),
+            A.ToSepia(transform_parameters['sepia_probability']),
+        ], p=transform_parameters['grayscale_sepia_probability']),
         A.Normalize(
             mean=transform_parameters['normalize_mean'],
             std=transform_parameters['normalize_std'],
