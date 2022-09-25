@@ -107,7 +107,7 @@ class ClassificationTrainer:
 
         val_loss = np.mean(losses)
         ground_truth = torch.cat(ground_truth, dim=0).numpy()
-        predictions = torch.sigmoid(torch.cat(predictions, dim=0).numpy())
+        predictions = torch.sigmoid(torch.cat(predictions, dim=0)).numpy()
 
         if self.dataset_parameters['targets'] == 'binary_encoded_label':
             val_scores = metrics.binary_classification_scores(y_true=ground_truth, y_pred=predictions, threshold=0.5)
