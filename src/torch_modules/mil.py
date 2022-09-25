@@ -143,7 +143,7 @@ class ClassificationHead(nn.Module):
 
     def __init__(self,
                  input_features, intermediate_features, n_classes, pooling_type,
-                 activation, activation_args, dropout_probability, initialization_args):
+                 activation, activation_args, dropout_probability, initialization_args=None):
 
         super(ClassificationHead, self).__init__()
 
@@ -156,8 +156,8 @@ class ClassificationHead(nn.Module):
             nn.Softmax(dim=-1) if n_classes > 1 else nn.Identity()
         )
 
-        for layer in self.classifier:
-            if initialization_args is not None:
+        if initialization_args is not None:
+            for layer in self.classifier:
                 if isinstance(layer, nn.Linear) or isinstance(layer, nn.BatchNorm1d):
                     init_weights(layer, **initialization_args)
 
