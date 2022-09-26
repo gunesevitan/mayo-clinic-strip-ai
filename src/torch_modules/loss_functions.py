@@ -68,9 +68,9 @@ class MacroBCEWithLogitsLoss(_WeightedLoss):
 
     def forward(self, inputs, targets):
 
-        targets = torch.sigmoid(targets)
+        inputs = torch.sigmoid(inputs)
         loss_positive = F.binary_cross_entropy_with_logits(inputs, targets, self.weight)
-        loss_negative = F.binary_cross_entropy_with_logits(inputs, 1 - targets, self.weight)
+        loss_negative = F.binary_cross_entropy_with_logits(1 - inputs, targets, self.weight)
         loss = (0.5 * loss_positive) + (0.5 * loss_negative)
 
         if self.reduction == 'mean':
