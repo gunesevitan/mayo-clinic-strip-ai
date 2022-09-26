@@ -194,7 +194,8 @@ class ClassificationTrainer:
                 'val_loss': [],
                 'val_accuracy': [],
                 'val_roc_auc': [],
-                'val_log_loss': []
+                'val_log_loss': [],
+                'val_weighted_log_loss': []
             }
 
             for epoch in range(1, self.training_parameters['epochs'] + 1):
@@ -236,6 +237,7 @@ class ClassificationTrainer:
                 summary['val_accuracy'].append(val_scores['accuracy'])
                 summary['val_roc_auc'].append(val_scores['roc_auc'])
                 summary['val_log_loss'].append(val_scores['log_loss'])
+                summary['val_weighted_log_loss'].append(val_scores['weighted_log_loss'])
 
                 best_epoch = np.argmin(summary['val_loss'])
                 if self.training_parameters['early_stopping_patience'] > 0:
@@ -244,7 +246,7 @@ class ClassificationTrainer:
                         logging.info(
                             f'''
                             Early Stopping (validation loss didn\'t improve for {self.training_parameters["early_stopping_patience"]} epochs)
-                            Best Epoch ({best_epoch + 1}) Validation Loss: {summary["val_loss"][best_epoch]:.4f} Accuracy: {summary["val_accuracy"][best_epoch]:.4f} ROC AUC: {summary["val_roc_auc"][best_epoch]:.4f} Log Loss: {summary["val_log_loss"][best_epoch]:.4f}'
+                            Best Epoch ({best_epoch + 1}) Validation Loss: {summary["val_loss"][best_epoch]:.4f} Accuracy: {summary["val_accuracy"][best_epoch]:.4f} ROC AUC: {summary["val_roc_auc"][best_epoch]:.4f} Log Loss: {summary["val_log_loss"][best_epoch]:.4f} Weighted Log Loss: {summary["val_weighted_log_loss"][best_epoch]:.4f}'
                             '''
                         )
                         early_stopping = True
@@ -253,6 +255,7 @@ class ClassificationTrainer:
                             'val_accuracy': summary['val_accuracy'][best_epoch],
                             'val_roc_auc': summary['val_roc_auc'][best_epoch],
                             'val_log_loss': summary['val_log_loss'][best_epoch],
+                            'val_weighted_log_loss': summary['val_weighted_log_loss'][best_epoch]
                         })
                 else:
                     if epoch == self.training_parameters['epochs']:
@@ -261,6 +264,7 @@ class ClassificationTrainer:
                             'val_accuracy': summary['val_accuracy'][best_epoch],
                             'val_roc_auc': summary['val_roc_auc'][best_epoch],
                             'val_log_loss': summary['val_log_loss'][best_epoch],
+                            'val_weighted_log_loss': summary['val_weighted_log_loss'][best_epoch]
                         })
 
             if self.persistence_parameters['visualize_learning_curve']:
@@ -270,7 +274,8 @@ class ClassificationTrainer:
                     validation_scores={
                         'val_accuracy': summary['val_accuracy'],
                         'val_roc_auc': summary['val_roc_auc'],
-                        'val_log_loss': summary['val_log_loss']
+                        'val_log_loss': summary['val_log_loss'],
+                        'val_weighted_log_loss': summary['val_weighted_log_loss']
                     },
                     path=model_root_directory / f'learning_curve_{fold}.png'
                 )

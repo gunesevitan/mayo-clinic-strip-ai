@@ -28,6 +28,27 @@ def soft_predictions_to_labels(x, threshold):
     return x
 
 
+def weighted_log_loss(y_true, y_pred):
+
+    """
+    Calculate weighted log loss on predictions and ground-truth
+
+    Parameters
+    ----------
+    y_true (array-like of shape (n_samples)): Ground-truth
+    y_pred (array-like of shape (n_samples)): Predictions
+
+    Returns
+    -------
+    weighted_log_loss (float): Weighted log loss score calculated on predictions and ground-truth
+    """
+
+    log_loss_positive = log_loss(y_true, y_pred)
+    log_loss_negative = log_loss(y_true, 1 - y_pred)
+
+    return (log_loss_positive + log_loss_negative) / 2
+
+
 def binary_classification_scores(y_true, y_pred, threshold):
 
     """
@@ -49,12 +70,14 @@ def binary_classification_scores(y_true, y_pred, threshold):
         roc_auc = roc_auc_score(y_true, y_pred)
     except ValueError:
         roc_auc = 0.5
-    log_loss_ = log_loss(y_true, y_pred)
+    regular_log_loss = log_loss(y_true, y_pred)
+    weighted_log_loss_ = weighted_log_loss(y_true, y_pred)
 
     scores = {
         'accuracy': accuracy,
         'roc_auc': roc_auc,
-        'log_loss': log_loss_
+        'log_loss': regular_log_loss,
+        'weighted_log_loss': weighted_log_loss_
     }
 
     return scores
