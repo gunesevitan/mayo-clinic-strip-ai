@@ -216,7 +216,7 @@ class ClassificationTrainer:
                 logging.info(
                     f'''
                     Epoch {epoch} - Training Loss: {train_loss:.4f} - Validation Loss: {val_loss:.4f}
-                    Validation Accuracy: {val_scores["accuracy"]:.4f} ROC AUC: {val_scores["roc_auc"]:.4f} Log Loss: {val_scores["log_loss"]:.4f}
+                    Validation Accuracy: {val_scores["accuracy"]:.4f} ROC AUC: {val_scores["roc_auc"]:.4f} Log Loss: {val_scores["log_loss"]:.4f} Weighted Log Loss: {val_scores["weighted_log_loss"]:.4f}
                     '''
                 )
 
