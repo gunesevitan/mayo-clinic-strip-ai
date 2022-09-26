@@ -55,3 +55,27 @@ class LabelSmoothingBCEWithLogitsLoss(_WeightedLoss):
             loss = loss.sum()
 
         return loss
+
+
+class MacroBCEWithLogitsLoss(_WeightedLoss):
+
+    def __init__(self, weight=None, reduction='mean'):
+
+        super(MacroBCEWithLogitsLoss, self).__init__(weight=weight, reduction=reduction)
+
+        self.weight = weight
+        self.reduction = reduction
+
+    def forward(self, inputs, targets):
+
+        targets = torch.sigmoid(targets)
+        loss_positive = F.binary_cross_entropy_with_logits(inputs, targets, self.weight)
+        loss_negative = F.binary_cross_entropy_with_logits(inputs, 1 - targets, self.weight)
+        loss = (loss_positive + loss_negative) / 2
+
+        if self.reduction == 'mean':
+            loss = loss.mean()
+        elif self.reduction == 'sum':
+            loss = loss.sum()
+
+        return loss
