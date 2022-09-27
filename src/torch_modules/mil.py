@@ -10,7 +10,8 @@ class ClassificationHead(nn.Module):
 
     def __init__(self,
                  input_features, intermediate_features, n_classes, pooling_type,
-                 activation, activation_args, dropout_probability, initialization_args=None):
+                 activation, activation_args, dropout_probability=0., batch_normalization=False,
+                 initialization_args=None):
 
         super(ClassificationHead, self).__init__()
 
@@ -18,7 +19,8 @@ class ClassificationHead(nn.Module):
         self.classifier = nn.Sequential(
             nn.Linear(input_features * 2 if pooling_type == 'concat' else input_features, intermediate_features, bias=True),
             getattr(nn, activation)(**activation_args),
-            nn.Dropout(p=dropout_probability) if dropout_probability >= 0 else nn.Identity(),
+            nn.BatchNorm1d(num_features=intermediate_features) if batch_normalization else nn.Identity(),
+            nn.Dropout(p=dropout_probability) if dropout_probability >= 0. else nn.Identity(),
             nn.Linear(intermediate_features, n_classes, bias=True),
             nn.Softmax(dim=-1) if n_classes > 1 else nn.Identity()
         )

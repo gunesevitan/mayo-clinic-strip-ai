@@ -108,11 +108,7 @@ class ClassificationTrainer:
         val_loss = np.mean(losses)
         ground_truth = torch.cat(ground_truth, dim=0).numpy()
         predictions = torch.sigmoid(torch.cat(predictions, dim=0)).numpy()
-
-        if self.model_parameters['model_args']['head_args']['n_classes'] > 1:
-            val_scores = metrics.multiclass_classification_scores(y_true=ground_truth, y_pred=predictions)
-        else:
-            val_scores = metrics.binary_classification_scores(y_true=ground_truth, y_pred=predictions, threshold=0.5)
+        val_scores = metrics.binary_classification_scores(y_true=ground_truth, y_pred=predictions, threshold=0.5)
 
         return val_loss, val_scores, predictions
 
@@ -228,11 +224,8 @@ class ClassificationTrainer:
                 if val_loss < best_val_loss:
                     # Save model if validation loss improves
                     torch.save(model.state_dict(), model_root_directory / f'model_{fold}_best.pt')
-                    print(f'Saved model_{fold}_best.pt (validation loss decreased from {best_val_loss:.6f} to {val_loss:.6f})\n')
-                    if self.model_parameters['model_args']['head_args']['n_classes'] > 1:
-                        df_train.loc[val_idx, 'predictions'] = val_predictions[:, 1]
-                    else:
-                        df_train.loc[val_idx, 'predictions'] = val_predictions
+                    logging.info(f'Saved model_{fold}_best.pt (validation loss decreased from {best_val_loss:.6f} to {val_loss:.6f})\n')
+                    df_train.loc[val_idx, 'predictions'] = val_predictions
 
                 summary['train_loss'].append(train_loss)
                 summary['val_loss'].append(val_loss)
