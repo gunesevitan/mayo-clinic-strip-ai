@@ -235,7 +235,10 @@ class ClassificationTrainer:
                     # Save model if validation loss improves
                     torch.save(model.state_dict(), model_root_directory / f'model_{fold}_best.pt')
                     print(f'Saved model_{fold}_best.pt (validation loss decreased from {best_val_loss:.6f} to {val_loss:.6f})\n')
-                    df_train.loc[val_idx, 'predictions'] = val_predictions
+                    if self.model_parameters['model_args']['head_args']['n_classes'] > 1:
+                        df_train.loc[val_idx, 'predictions'] = val_predictions[:, 1]
+                    else:
+                        df_train.loc[val_idx, 'predictions'] = val_predictions
 
                 summary['train_loss'].append(train_loss)
                 summary['val_loss'].append(val_loss)
