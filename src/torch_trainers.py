@@ -115,12 +115,10 @@ class ClassificationTrainer:
         ground_truth = torch.cat(ground_truth, dim=0).numpy()
         predictions = torch.sigmoid(torch.cat(predictions, dim=0)).numpy()
 
-        if self.dataset_parameters['targets'] == 'binary_encoded_label':
-            val_scores = metrics.binary_classification_scores(y_true=ground_truth, y_pred=predictions, threshold=0.5)
-        elif self.dataset_parameters['targets'] == 'multiclass_encoded':
+        if self.model_parameters['model_args']['head_args']['n_classes'] > 1:
             val_scores = metrics.multiclass_classification_scores(y_true=ground_truth, y_pred=predictions)
         else:
-            raise ValueError(f'Invalid targets {self.dataset_parameters["targets"]}')
+            val_scores = metrics.binary_classification_scores(y_true=ground_truth, y_pred=predictions, threshold=0.5)
 
         return val_loss, val_scores, predictions
 
