@@ -56,10 +56,7 @@ class ClassificationTrainer:
             inputs, targets = inputs.to(device), targets.to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
-            if isinstance(criterion, torch.nn.CrossEntropyLoss):
-                loss = criterion(outputs, targets.reshape(-1).long())
-            else:
-                loss = criterion(outputs, targets)
+            loss = criterion(outputs, targets)
             loss.backward()
             optimizer.step()
             if scheduler is not None:
@@ -101,10 +98,7 @@ class ClassificationTrainer:
             for inputs, targets in progress_bar:
                 inputs, targets = inputs.to(device), targets.to(device)
                 outputs = model(inputs)
-                if isinstance(criterion, torch.nn.CrossEntropyLoss):
-                    loss = criterion(outputs, targets.reshape(-1).long())
-                else:
-                    loss = criterion(outputs, targets)
+                loss = criterion(outputs, targets)
                 losses.append(loss.detach().item())
                 average_loss = np.mean(losses)
                 progress_bar.set_description(f'val_loss: {average_loss:.6f}')
