@@ -28,10 +28,10 @@ def soft_predictions_to_labels(x, threshold):
     return x
 
 
-def weighted_log_loss(y_true, y_pred):
+def binary_weighted_log_loss(y_true, y_pred):
 
     """
-    Calculate weighted log loss on predictions and ground-truth
+    Calculate positive, negative and weighted log loss on predictions and ground-truth
 
     Parameters
     ----------
@@ -45,8 +45,9 @@ def weighted_log_loss(y_true, y_pred):
 
     log_loss_positive = log_loss(y_true, y_pred)
     log_loss_negative = log_loss(y_true, 1 - y_pred)
+    log_loss_weighted = 0.5 * log_loss_positive + 0.5 * log_loss_negative
 
-    return (log_loss_positive + log_loss_negative) / 2
+    return log_loss_positive, log_loss_negative, log_loss_weighted
 
 
 def binary_classification_scores(y_true, y_pred, threshold):
@@ -70,17 +71,39 @@ def binary_classification_scores(y_true, y_pred, threshold):
         roc_auc = roc_auc_score(y_true, y_pred)
     except ValueError:
         roc_auc = 0.5
-    regular_log_loss = log_loss(y_true, y_pred)
-    weighted_log_loss_ = weighted_log_loss(y_true, y_pred)
+    log_loss_positive, log_loss_negative, log_loss_weighted = binary_weighted_log_loss(y_true, y_pred)
 
     scores = {
         'accuracy': accuracy,
         'roc_auc': roc_auc,
-        'log_loss': regular_log_loss,
-        'weighted_log_loss': weighted_log_loss_
+        'log_loss_positive': log_loss_positive,
+        'log_loss_negative': log_loss_negative,
+        'log_loss_weighted': log_loss_weighted
     }
 
     return scores
+
+
+def multiclass_weighted_log_loss(y_true, y_pred):
+
+    """
+    Calculate positive, negative and weighted log loss on predictions and ground-truth
+
+    Parameters
+    ----------
+    y_true (array-like of shape (n_samples)): Ground-truth
+    y_pred (array-like of shape (n_samples)): Predictions
+
+    Returns
+    -------
+    weighted_log_loss (float): Weighted log loss score calculated on predictions and ground-truth
+    """
+
+    log_loss_positive = log_loss(y_true, y_pred[:, 1])
+    log_loss_negative = log_loss(y_true, y_pred[:, 0])
+    log_loss_weighted = 0.5 * log_loss_positive + 0.5 * log_loss_negative
+
+    return log_loss_positive, log_loss_negative, log_loss_weighted
 
 
 def multiclass_classification_scores(y_true, y_pred):
@@ -98,17 +121,19 @@ def multiclass_classification_scores(y_true, y_pred):
     scores (dict): Dictionary of scores
     """
 
-    accuracy = accuracy_score(y_true, soft_predictions_to_labels(y_pred, threshold=threshold))
+    accuracy = accuracy_score(y_true, np.argmax(y_pred, axis=1))
     try:
         roc_auc = np.mean([roc_auc_score(y_true, y_pred[:, i]) for i in range(y_pred.shape[1])])
     except ValueError:
         roc_auc = 0.5
-    log_loss_ = log_loss(y_true, y_pred)
+    log_loss_positive, log_loss_negative, log_loss_weighted = multiclass_weighted_log_loss(y_true, y_pred)
 
     scores = {
         'accuracy': accuracy,
         'roc_auc': roc_auc,
-        'log_loss': log_loss_
+        'log_loss_positive': log_loss_positive,
+        'log_loss_negative': log_loss_negative,
+        'log_loss_weighted': log_loss_weighted
     }
 
     return scores
