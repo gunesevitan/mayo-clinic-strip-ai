@@ -94,14 +94,15 @@ class ConvolutionalMultiInstanceLearningModel(nn.Module):
             if freeze_parameters == 'all':
                 for parameter in self.backbone.parameters():
                     parameter.requires_grad = False
-            # Freeze specified parameters in backbone
-            for group in freeze_parameters:
-                if isinstance(self.backbone, timm.models.DenseNet):
-                    for parameter in self.backbone.features[group].parameters():
-                        parameter.requires_grad = False
-                elif isinstance(self.backbone, timm.models.EfficientNet):
-                    for parameter in self.backbone.blocks[group].parameters():
-                        parameter.requires_grad = False
+            else:
+                # Freeze specified parameters in backbone
+                for group in freeze_parameters:
+                    if isinstance(self.backbone, timm.models.DenseNet):
+                        for parameter in self.backbone.features[group].parameters():
+                            parameter.requires_grad = False
+                    elif isinstance(self.backbone, timm.models.EfficientNet):
+                        for parameter in self.backbone.blocks[group].parameters():
+                            parameter.requires_grad = False
 
         n_classifier_features = self.backbone.get_classifier().in_features
         self.classification_head = eval(head_class)(input_features=n_classifier_features * n_instances, **head_args)
