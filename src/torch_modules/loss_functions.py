@@ -90,7 +90,7 @@ class WeightedLogLoss(_WeightedLoss):
 
         self.weight = weight
         self.reduction = reduction
-        self.nll_loss = nn.NLLLoss(weight=torch.tensor(weight, device='cuda'))
+        self.nll_loss = nn.NLLLoss(weight=torch.tensor(weight, dtype=torch.long, device='cuda'))
 
     def forward(self, inputs, targets):
 
