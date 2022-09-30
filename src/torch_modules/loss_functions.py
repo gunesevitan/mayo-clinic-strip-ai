@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 from torch.nn.modules.loss import _WeightedLoss
 import torch.nn.functional as F
 
@@ -83,15 +84,21 @@ class MacroBCEWithLogitsLoss(_WeightedLoss):
 
 class WeightedLogLoss(_WeightedLoss):
 
-    def __init__(self, weight=torch.tensor([0.5, 0.5]).cuda(), reduction='mean'):
+    def __init__(self, weight=None, reduction='mean'):
 
         super(WeightedLogLoss, self).__init__(weight=weight, reduction=reduction)
 
         self.weight = weight
         self.reduction = reduction
+        self.nll_loss = nn.NLLLoss(weight=torch.tensor(weight, device='cuda'))
 
     def forward(self, inputs, targets):
 
-        a = torch.log(torch.clamp(inputs, 1e-15, 1.0 - 1e-15)).cuda()
-        b = torch.tensor([torch.clamp(torch.sum(targets), min=1e-15), torch.clamp(torch.sum(1 - targets), min=1e-15)]).cuda()
-        return torch.sum(-torch.sum(self.weight * targets * a * 1 / b))
+        loss = self.nll_loss(inputs, targets)
+
+        if self.reduction == 'mean':
+            loss = loss.mean()
+        elif self.reduction == 'sum':
+            loss = loss.sum()
+
+        return loss
