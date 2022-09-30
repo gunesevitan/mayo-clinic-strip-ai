@@ -83,7 +83,7 @@ class MacroBCEWithLogitsLoss(_WeightedLoss):
 
 class WeightedLogLoss(_WeightedLoss):
 
-    def __init__(self, weight=torch.tensor([0.5,0.5]).cuda(), reduction='mean'):
+    def __init__(self, weight=torch.tensor([0.5, 0.5]).cuda(), reduction='mean'):
 
         super(WeightedLogLoss, self).__init__(weight=weight, reduction=reduction)
 
@@ -93,5 +93,5 @@ class WeightedLogLoss(_WeightedLoss):
     def forward(self, inputs, targets):
 
         a = torch.log(torch.clamp(inputs, 1e-15, 1.0 - 1e-15)).cuda()
-        b = torch.tensor([torch.clamp(torch.sum(targets[:, 0]), min=1e-15), torch.clamp(torch.sum(targets[:, 1]), min=1e-15)]).cuda()
+        b = torch.tensor([torch.clamp(torch.sum(targets), min=1e-15), torch.clamp(torch.sum(1 - targets), min=1e-15)]).cuda()
         return torch.sum(-torch.sum(self.weight * targets * a * 1 / b))
