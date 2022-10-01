@@ -188,9 +188,12 @@ class ClassificationTrainer:
                 'val_loss': [],
                 'val_accuracy': [],
                 'val_roc_auc': [],
-                'val_log_loss_positive': [],
-                'val_log_loss_negative': [],
-                'val_log_loss_weighted': []
+                'val_log_loss_positive1': [],
+                'val_log_loss_negative1': [],
+                'val_log_loss_weighted1': [],
+                'val_log_loss_positive2': [],
+                'val_log_loss_negative2': [],
+                'val_log_loss_weighted2': []
             }
 
             for epoch in range(1, self.training_parameters['epochs'] + 1):
@@ -211,7 +214,10 @@ class ClassificationTrainer:
                 logging.info(
                     f'''
                     Epoch {epoch} - Training Loss: {train_loss:.4f} - Validation Loss: {val_loss:.4f}
-                    Validation Accuracy: {val_scores["accuracy"]:.4f} ROC AUC: {val_scores["roc_auc"]:.4f} Positive Log Loss: {val_scores["log_loss_positive"]:.4f} Negative Log Loss: {val_scores["log_loss_negative"]:.4f} Weighted Log Loss: {val_scores["log_loss_weighted"]:.4f}
+                    Validation Scores
+                    Accuracy: {val_scores["accuracy"]:.4f} ROC AUC: {val_scores["roc_auc"]:.4f}
+                    1 - Positive Log Loss: {val_scores["log_loss_positive1"]:.4f} Negative Log Loss: {val_scores["log_loss_negative1"]:.4f} Weighted Log Loss: {val_scores["log_loss_weighted1"]:.4f}
+                    2 - Positive Log Loss: {val_scores["log_loss_positive2"]:.4f} Negative Log Loss: {val_scores["log_loss_negative2"]:.4f} Weighted Log Loss: {val_scores["log_loss_weighted2"]:.4f}
                     '''
                 )
 
@@ -231,9 +237,12 @@ class ClassificationTrainer:
                 summary['val_loss'].append(val_loss)
                 summary['val_accuracy'].append(val_scores['accuracy'])
                 summary['val_roc_auc'].append(val_scores['roc_auc'])
-                summary['val_log_loss_positive'].append(val_scores['log_loss_positive'])
-                summary['val_log_loss_negative'].append(val_scores['log_loss_negative'])
-                summary['val_log_loss_weighted'].append(val_scores['log_loss_weighted'])
+                summary['val_log_loss_positive1'].append(val_scores['log_loss_positive1'])
+                summary['val_log_loss_negative1'].append(val_scores['log_loss_negative1'])
+                summary['val_log_loss_weighted1'].append(val_scores['log_loss_weighted1'])
+                summary['val_log_loss_positive2'].append(val_scores['log_loss_positive2'])
+                summary['val_log_loss_negative2'].append(val_scores['log_loss_negative2'])
+                summary['val_log_loss_weighted2'].append(val_scores['log_loss_weighted2'])
 
                 best_epoch = np.argmin(summary['val_loss'])
                 if self.training_parameters['early_stopping_patience'] > 0:
@@ -242,7 +251,11 @@ class ClassificationTrainer:
                         logging.info(
                             f'''
                             Early Stopping (validation loss didn\'t improve for {self.training_parameters["early_stopping_patience"]} epochs)
-                            Best Epoch ({best_epoch + 1}) Validation Loss: {summary["val_loss"][best_epoch]:.4f} Accuracy: {summary["val_accuracy"][best_epoch]:.4f} ROC AUC: {summary["val_roc_auc"][best_epoch]:.4f} Positive Log Loss: {summary["val_log_loss_positive"][best_epoch]:.4f} Negative Log Loss: {summary["val_log_loss_negative"][best_epoch]:.4f} Weighted Log Loss: {summary["val_log_loss_weighted"][best_epoch]:.4f}'
+                            Best Epoch ({best_epoch + 1}) Validation Loss: {summary["val_loss"][best_epoch]:.4f}
+                            Validation Scores
+                            Accuracy: {summary["val_accuracy"][best_epoch]:.4f} ROC AUC: {summary["val_roc_auc"][best_epoch]:.4f}
+                            1 - Positive Log Loss: {summary["val_log_loss_positive1"][best_epoch]:.4f} Negative Log Loss: {summary["val_log_loss_negative1"][best_epoch]:.4f} Weighted Log Loss: {summary["val_log_loss_weighted1"][best_epoch]:.4f}'
+                            2 - Positive Log Loss: {summary["val_log_loss_positive2"][best_epoch]:.4f} Negative Log Loss: {summary["val_log_loss_negative2"][best_epoch]:.4f} Weighted Log Loss: {summary["val_log_loss_weighted2"][best_epoch]:.4f}'
                             '''
                         )
                         early_stopping = True
@@ -250,9 +263,12 @@ class ClassificationTrainer:
                             'val_loss': summary['val_loss'][best_epoch],
                             'val_accuracy': summary['val_accuracy'][best_epoch],
                             'val_roc_auc': summary['val_roc_auc'][best_epoch],
-                            'val_log_loss_positive': summary['val_log_loss_positive'][best_epoch],
-                            'val_log_loss_negative': summary['val_log_loss_negative'][best_epoch],
-                            'val_log_loss_weighted': summary['val_log_loss_weighted'][best_epoch]
+                            'val_log_loss_positive1': summary['val_log_loss_positive1'][best_epoch],
+                            'val_log_loss_negative1': summary['val_log_loss_negative1'][best_epoch],
+                            'val_log_loss_weighted1': summary['val_log_loss_weighted1'][best_epoch],
+                            'val_log_loss_positive2': summary['val_log_loss_positive2'][best_epoch],
+                            'val_log_loss_negative2': summary['val_log_loss_negative2'][best_epoch],
+                            'val_log_loss_weighted2': summary['val_log_loss_weighted2'][best_epoch]
                         })
                 else:
                     if epoch == self.training_parameters['epochs']:
@@ -260,9 +276,12 @@ class ClassificationTrainer:
                             'val_loss': summary['val_loss'][best_epoch],
                             'val_accuracy': summary['val_accuracy'][best_epoch],
                             'val_roc_auc': summary['val_roc_auc'][best_epoch],
-                            'val_log_loss_positive': summary['val_log_loss_positive'][best_epoch],
-                            'val_log_loss_negative': summary['val_log_loss_negative'][best_epoch],
-                            'val_log_loss_weighted': summary['val_log_loss_weighted'][best_epoch]
+                            'val_log_loss_positive1': summary['val_log_loss_positive1'][best_epoch],
+                            'val_log_loss_negative1': summary['val_log_loss_negative1'][best_epoch],
+                            'val_log_loss_weighted1': summary['val_log_loss_weighted1'][best_epoch],
+                            'val_log_loss_positive2': summary['val_log_loss_positive2'][best_epoch],
+                            'val_log_loss_negative2': summary['val_log_loss_negative2'][best_epoch],
+                            'val_log_loss_weighted2': summary['val_log_loss_weighted2'][best_epoch]
                         })
 
             if self.persistence_parameters['visualize_learning_curve']:
@@ -272,9 +291,12 @@ class ClassificationTrainer:
                     validation_scores={
                         'val_accuracy': summary['val_accuracy'],
                         'val_roc_auc': summary['val_roc_auc'],
-                        'val_log_loss_positive': summary['val_log_loss_positive'],
-                        'val_log_loss_negative': summary['val_log_loss_negative'],
-                        'val_log_loss_weighted': summary['val_log_loss_weighted']
+                        'val_log_loss_positive1': summary['val_log_loss_positive1'],
+                        'val_log_loss_negative1': summary['val_log_loss_negative1'],
+                        'val_log_loss_weighted1': summary['val_log_loss_weighted1'],
+                        'val_log_loss_positive2': summary['val_log_loss_positive2'],
+                        'val_log_loss_negative2': summary['val_log_loss_negative2'],
+                        'val_log_loss_weighted2': summary['val_log_loss_weighted2']
                     },
                     path=model_root_directory / f'learning_curve_{fold}.png'
                 )
