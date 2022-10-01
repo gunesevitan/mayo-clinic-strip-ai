@@ -82,19 +82,19 @@ class MacroBCEWithLogitsLoss(_WeightedLoss):
         return loss
 
 
-class WeightedLogLoss(_WeightedLoss):
+class BinaryNLLLoss(nn.Module):
 
-    def __init__(self, weight=None, reduction='mean'):
+    def __init__(self, reduction='mean'):
 
-        super(WeightedLogLoss, self).__init__(weight=weight, reduction=reduction)
+        super(BinaryNLLLoss, self).__init__()
 
-        self.weight = weight
         self.reduction = reduction
-        self.nll_loss = nn.NLLLoss(weight=torch.tensor(weight, dtype=torch.long, device='cuda'))
 
     def forward(self, inputs, targets):
 
-        loss = self.nll_loss(inputs, targets)
+        inputs = torch.sigmoid(inputs)
+        inputs = torch.cat(((1 - inputs), inputs), dim=-1)
+        loss = F.nll_loss(torch.log(inputs), targets.long().reshape(-1))
 
         if self.reduction == 'mean':
             loss = loss.mean()
