@@ -124,7 +124,7 @@ class ConvolutionalMultiInstanceLearningModel(nn.Module):
 
 class TransformerMultiInstanceLearningModel(nn.Module):
 
-    def __init__(self, n_instances, model_name, pretrained, head_class, head_args):
+    def __init__(self, n_instances, model_name, pretrained, freeze_parameters, head_class, head_args):
 
         super(TransformerMultiInstanceLearningModel, self).__init__()
 
@@ -133,6 +133,13 @@ class TransformerMultiInstanceLearningModel(nn.Module):
             pretrained=pretrained,
             num_classes=head_args['n_classes']
         )
+
+        if freeze_parameters is not None:
+            # Freeze all parameters in backbone
+            if freeze_parameters == 'all':
+                for parameter in self.backbone.parameters():
+                    parameter.requires_grad = False
+
         n_classifier_features = self.backbone.get_classifier().in_features
         self.backbone.head = nn.Identity()
         self.classification_head = eval(head_class)(input_features=n_classifier_features * n_instances, **head_args)
