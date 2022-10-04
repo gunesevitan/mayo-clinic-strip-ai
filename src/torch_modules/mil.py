@@ -79,7 +79,7 @@ class TransformerClassificationHead(nn.Module):
 
 class ConvolutionalMultiInstanceLearningModel(nn.Module):
 
-    def __init__(self, n_instances, model_name, pretrained, freeze_parameters, head_class, head_args):
+    def __init__(self, n_instances, model_name, pretrained, freeze_parameters, aggregation, head_class, head_args):
 
         super(ConvolutionalMultiInstanceLearningModel, self).__init__()
 
@@ -104,8 +104,10 @@ class ConvolutionalMultiInstanceLearningModel(nn.Module):
                         for parameter in self.backbone.blocks[group].parameters():
                             parameter.requires_grad = False
 
+        self.aggregation = aggregation
         n_classifier_features = self.backbone.get_classifier().in_features
-        self.classification_head = eval(head_class)(input_features=n_classifier_features * n_instances, **head_args)
+        input_features = (n_classifier_features * n_instances) if self.aggregation == 'concat' else n_classifier_features
+        self.classification_head = eval(head_class)(input_features=input_features, **head_args)
 
     def forward(self, x):
 
@@ -113,12 +115,21 @@ class ConvolutionalMultiInstanceLearningModel(nn.Module):
         input_batch_size, input_instance, input_channel, input_height, input_width = x.shape
         x = x.view(input_batch_size * input_instance, input_channel, input_height, input_width)
         x = self.backbone.forward_features(x)
-
-        # Stack feature maps on channel dimension before passing feature maps to classification head
         feature_batch_size, feature_channel, feature_height, feature_width = x.shape
-        x = x.contiguous().view(input_batch_size, feature_channel * input_instance, feature_height, feature_width)
-        output = self.classification_head(x)
 
+        if self.aggregation == 'avg':
+            # Average feature maps of multiple instances
+            x = x.contiguous().view(input_batch_size, input_instance, feature_channel, feature_height, feature_width)
+            x = torch.mean(x, dim=1)
+        elif self.aggregation == 'max':
+            # Max feature maps of multiple instances
+            x = x.contiguous().view(input_batch_size, input_instance, feature_channel, feature_height, feature_width)
+            x = torch.max(x, dim=1)
+        elif self.aggregation == 'concat':
+            # Stack feature maps on channel dimension before passing feature maps to classification head
+            x = x.contiguous().view(input_batch_size, input_instance * feature_channel, feature_height, feature_width)
+
+        output = self.classification_head(x)
         return output
 
 
