@@ -124,7 +124,7 @@ class ConvolutionalMultiInstanceLearningModel(nn.Module):
         elif self.aggregation == 'max':
             # Max feature maps of multiple instances
             x = x.contiguous().view(input_batch_size, input_instance, feature_channel, feature_height, feature_width)
-            x = torch.max(x, dim=1)
+            x = torch.max(x, dim=1)[0]
         elif self.aggregation == 'concat':
             # Stack feature maps on channel dimension before passing feature maps to classification head
             x = x.contiguous().view(input_batch_size, input_instance * feature_channel, feature_height, feature_width)
