@@ -151,41 +151,42 @@ Models with OOF ROC AUC score greater than 0.65 are qualified for the ensemble.
 * PoolFormer 24 (ImageNet pre-trained weights) - 224x224 16 instances
 * Swin Transformer Tiny Patch 4 Window 7 (ImageNet pre-trained weights) - 224x224 16 instances
 
-Different ensemble weights are used for each organ type and those weights are found by trial and error.
+Blending is utilized on selected models. Blend weights are found by trial and error.
 
+```
+blend_weights = {
+    'mil_densenet121_16_256': 0.10,
+    'mil_densenet169_16_256': 0.10,
+    'mil_densenetblur121d_16_256': 0.25,
+    'mil_efficientnetb2_16_256': 0.125,
+    'mil_efficientnetv2rwt_16_256': 0.125,
+    'mil_coatlitemini_16_224': 0.10,
+    'mil_poolformer24_16_224': 0.10,
+    'mil_swintinypatch4window7_16_224': 0.10
+}
+```
+
+Linear stacking is also utilized on selected models by fitting a linear regression model on training predictions and targets.
 
 ## Post-processing
 
-Soft predictions are upsampled to their original sizes using cubic interpolation.
-Hard labels are obtained using different thresholds for each organ type.
-Thresholds are found by trial and error.
-
-* **Kidney**: 0.25
-* **Prostate**: 0.20
-* **Spleen**: 0.25
-* **Large Intestine**: 0.20
-* **Lung**: 0.05
-
+Predictions are averaged among patient_id groups and 0.21 is added to aggregated predictions for making the prediction 0.5 centered.
+That constant is selected by maximizing the OOF score.
 
 ## Results
 
-Quantitative results are provided as cross-validation and public leaderboard scores.
-Public leaderboard scores of both HPA-HuBMAP samples and only HuBMAP samples are tracked.
+Quantitative results are provided as cross-validation, public and private leaderboard scores.
+Best single model and ensemble cross-validation scores are highlighted.
 
-|                      | Cross-Validation | Public Leaderboard (HPA and HuBMAP) | Public Leaderboard (HuBMAP) |
-|----------------------|------------------|-------------------------------------|-----------------------------|
-| UNet EfficientNet-B3 | 0.7821           | 0.79                                | 0.58                        |
-| UNet EfficientNet-B6 | 0.7809           | 0.81                                | 0.59                        |
-| SegFormer MiT-B3     | 0.7765           | 0.78                                | 0.58                        |
-| CoaT lite small      | 0.7857           | 0.80                                | 0.58                        |
-| CoaT lite medium     | 0.7841           | 0.81                                | 0.59                        |
-| Ensemble             |                  | 0.82                                | 0.59                        |
-
-Qualitative results are provided as predictions visualizations of randomly selected samples for each organ type and the single test image.
-
-![hpa_kidney_prediction](static/hpa_kidney_predictions.png "hpa_kidney_prediction")
-![hpa_prostate_prediction](static/hpa_prostate_predictions.png "hpa_prostate_prediction")
-![hpa_spleen_prediction](static/hpa_spleen_predictions.png "hpa_spleen_prediction")
-![hpa_largeintestine_prediction](static/hpa_largeintestine_predictions.png "hpa_largeintestine_prediction")
-![hpa_lung_prediction](static/hpa_lung_predictions.png "hpa_lung_prediction")
-![hubmap_spleen_prediction](static/hubmap_spleen_predictions.png "hubmap_spleen_prediction")
+|                                             | CV ROC AUC | CV Weighted Log Loss | Public Leaderboard | Private Leaderboard |
+|---------------------------------------------|------------|----------------------|--------------------|---------------------|
+| DenseNet121                                 | 0.6501     |                      |                    |                     |
+| DenseNetBlur121d                            | **0.6628** |                      |                    |                     |
+| DenseNet169                                 | 0.6551     |                      |                    |                     |
+| EfficientNetB2                              | 0.6501     |                      |                    |                     |
+| EfficientNetV2 Tiny                         | 0.6500     |                      |                    |                     |
+| CoaT Lite Mini                              | 0.6503     |                      |                    |                     |
+| PoolFormer 24                               | 0.6536     |                      |                    |                     |
+| Swin Transformer Tiny Patch 4 Window 7      | 0.6497     |                      |                    |                     |
+| Blend + patient_id Aggregation + Adjustment | 0.6822     | 0.6471               | 0.6                |                     |
+| Stack + patient_id Aggregation + Adjustment | **0.6842** | **0.6387**           | 0.6                |                     |
