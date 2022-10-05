@@ -1,0 +1,64 @@
+{
+  "fold_scores": {
+    "fold1": {
+      "accuracy": 0.7189542483660131,
+      "roc_auc": 0.6776878092667566,
+      "log_loss_positive1": 0.5394994709275517,
+      "log_loss_negative1": 1.2704104386708315,
+      "log_loss_weighted1": 0.9049549547991915,
+      "log_loss_positive2": 1.1641628467119658,
+      "log_loss_negative2": 0.32579884236972584,
+      "log_loss_weighted2": 0.7449808445408458
+    },
+    "fold2": {
+      "accuracy": 0.6948051948051948,
+      "roc_auc": 0.5689003778087095,
+      "log_loss_positive1": 0.6273512977671314,
+      "log_loss_negative1": 1.144325900097172,
+      "log_loss_weighted1": 0.8858385989321517,
+      "log_loss_positive2": 1.4276937132186078,
+      "log_loss_negative2": 0.27579902182115573,
+      "log_loss_weighted2": 0.8517463675198818
+    },
+    "fold3": {
+      "accuracy": 0.7432432432432432,
+      "roc_auc": 0.6604662698412698,
+      "log_loss_positive1": 0.5356827210886655,
+      "log_loss_negative1": 1.5536212837323546,
+      "log_loss_weighted1": 1.0446520024105101,
+      "log_loss_positive2": 1.4502085261046886,
+      "log_loss_negative2": 0.241727998047801,
+      "log_loss_weighted2": 0.8459682620762449
+    },
+    "fold4": {
+      "accuracy": 0.7333333333333333,
+      "roc_auc": 0.6641306780040278,
+      "log_loss_positive1": 0.5485408385097981,
+      "log_loss_negative1": 1.157254320482413,
+      "log_loss_weighted1": 0.8528975794961056,
+      "log_loss_positive2": 1.2142370612156101,
+      "log_loss_negative2": 0.2981413418956853,
+      "log_loss_weighted2": 0.7561892015556477
+    },
+    "fold5": {
+      "accuracy": 0.7046979865771812,
+      "roc_auc": 0.6818181818181818,
+      "log_loss_positive1": 0.5628197141641739,
+      "log_loss_negative1": 1.1502457816128764,
+      "log_loss_weighted1": 0.8565327478885252,
+      "log_loss_positive2": 1.1681105968627064,
+      "log_loss_negative2": 0.30917401093812213,
+      "log_loss_weighted2": 0.7386423039004142
+    }
+  },
+  "oof_scores": {
+    "accuracy": 0.7188328912466844,
+    "roc_auc": 0.649718711637478,
+    "log_loss_positive1": 0.5631005634165885,
+    "log_loss_negative1": 1.2539916515340461,
+    "log_loss_weighted1": 0.9085461074753174,
+    "log_loss_positive2": 1.284502648572991,
+    "log_loss_negative2": 0.2901019681197416,
+    "log_loss_weighted2": 0.7873023083463663
+  }
+}

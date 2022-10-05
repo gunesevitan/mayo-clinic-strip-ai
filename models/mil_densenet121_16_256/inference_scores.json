@@ -1,0 +1,46 @@
+{
+  "fold_scores": {
+    "fold1": {
+      "accuracy": 0.7516339869281046,
+      "roc_auc": 0.6821862348178138,
+      "log_loss_positive": 0.528037708544848,
+      "log_loss_negative": 1.2586819356660437,
+      "log_loss_weighted": 0.8933598221054458
+    },
+    "fold2": {
+      "accuracy": 0.6948051948051948,
+      "roc_auc": 0.5786438655796382,
+      "log_loss_positive": 0.615461698600224,
+      "log_loss_negative": 1.0676868765965684,
+      "log_loss_weighted": 0.8415742875983963
+    },
+    "fold3": {
+      "accuracy": 0.7567567567567568,
+      "roc_auc": 0.6574900793650793,
+      "log_loss_positive": 0.526760836912168,
+      "log_loss_negative": 1.284838162060525,
+      "log_loss_weighted": 0.9057994994863465
+    },
+    "fold4": {
+      "accuracy": 0.74,
+      "roc_auc": 0.6220631013649586,
+      "log_loss_positive": 0.5635231031229099,
+      "log_loss_negative": 1.1492313535511494,
+      "log_loss_weighted": 0.8563772283370297
+    },
+    "fold5": {
+      "accuracy": 0.7181208053691275,
+      "roc_auc": 0.6995670995670995,
+      "log_loss_positive": 0.5601508376382341,
+      "log_loss_negative": 1.23503850915488,
+      "log_loss_weighted": 0.897594673396557
+    }
+  },
+  "oof_scores": {
+    "accuracy": 0.7320954907161804,
+    "roc_auc": 0.6501337996449673,
+    "log_loss_positive": 0.5590482959301465,
+    "log_loss_negative": 1.1983602175523653,
+    "log_loss_weighted": 0.878704256741256
+  }
+}
