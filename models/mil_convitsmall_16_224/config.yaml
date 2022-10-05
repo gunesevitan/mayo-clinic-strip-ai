@@ -1,0 +1,86 @@
+task: binary_classification
+
+dataset_parameters:
+  inputs: image_filename
+  targets: binary_encoded_label
+  n_tiles: 16
+
+model_parameters:
+  model_class: TransformerMultiInstanceLearningModel
+  model_args:
+    n_instances: 16
+    model_name: convit_small
+    pretrained: True
+    freeze_parameters: null
+    head_class: TransformerClassificationHead
+    head_args:
+      intermediate_features: 512
+      n_classes: 1
+      #pooling_type: avg
+      activation: ReLU
+      activation_args: {}
+      dropout_probability: 0.1
+      batch_normalization: False
+      initialization_args: null
+  model_checkpoint_path: null
+
+training_parameters:
+  folds: [fold1, fold2, fold3, fold4, fold5]
+  loss_function: BinaryNLLLoss
+  loss_args: {}
+  optimizer: AdamW
+  optimizer_args:
+    lr: 0.00001
+    betas: [0.9, 0.999]
+    weight_decay: 0
+  lr_scheduler: CosineAnnealingLR
+  lr_scheduler_args:
+    T_max: 300
+    eta_min: 0.000001
+    last_epoch: -1
+  epochs: 250
+  early_stopping_patience: 5
+  training_batch_size: 4
+  test_batch_size: 8
+  num_workers: 4
+  random_state: 42
+  deterministic_cudnn: False
+  device: cuda
+
+transform_parameters:
+  resize_height: 224
+  resize_width: 224
+  standardize_luminosity_probability: 0.10
+  horizontal_flip_probability: 0.50
+  vertical_flip_probability: 0.50
+  random_rotate_90_probability: 0.25
+  hue_shift_limit: 20
+  saturation_shift_limit: 30
+  value_shift_limit: 20
+  hue_saturation_value_probability: 0.25
+  coarse_dropout_max_holes: 16
+  coarse_dropout_max_height: 16
+  coarse_dropout_max_width: 16
+  coarse_dropout_min_holes: 2
+  coarse_dropout_min_height: 4
+  coarse_dropout_min_width: 4
+  coarse_dropout_fill_value: 0
+  coarse_dropout_probability: 0.50
+  pixel_dropout_dropout_probability: 0.10
+  pixel_dropout_per_channel: False
+  pixel_dropout_drop_value: 0
+  pixel_dropout_probability: 0.50
+  dropout_probability: 0.10
+  normalize_mean: [0.8438604946794181, 0.6589161597132999, 0.574509597899743]
+  normalize_std: [0.175015812380934, 0.28778972979471773, 0.3832600645683964]
+  normalize_max_pixel_value: 255
+
+inference_parameters:
+  folds: [fold1, fold2, fold3, fold4, fold5]
+
+persistence_parameters:
+  name: mil_model
+  visualize_learning_curve: True
+  visualize_training_scores: True
+  save_best_model: True
+  save_epoch_model: []
