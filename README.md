@@ -189,4 +189,4 @@ Best single model and ensemble cross-validation scores are highlighted.
 | PoolFormer 24                               | 0.6536     |                      |                    |                     |
 | Swin Transformer Tiny Patch 4 Window 7      | 0.6497     |                      |                    |                     |
 | Blend + patient_id Aggregation + Adjustment | 0.6822     | 0.6471               | 0.6                |                     |
-| Stack + patient_id Aggregation + Adjustment | **0.6842** | **0.6387**           | 0.6                |                     |
+| Stack + patient_id Aggregation + Adjustment | **0.6842** | **0.6387**           | **0.6**            |                     |
